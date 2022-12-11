@@ -45,7 +45,7 @@ Create another file with a text editor, this time in the **/etc/pam.d/** sub-dir
 ```
 #Apply limits:
 session required pam_limits.so
-``` 
+```
 
 **Check noexec on /tmp directory**
 
@@ -67,23 +67,18 @@ tmpfs on /tmp type tmpfs (rw,nosuid,nodev,noexec,seclabel)
 
 You can temporarily remove noexec using **mount** to 'remount' the directory:
 
- 
-
-|                           |
-| ------------------------- |
-| mount -oremount,exec /tmp |
-
+```
+mount -oremount,exec /tmp
+```
  
 
 To permanently remove the noexec flag, update **/etc/fstab** to remove the flag from the options:
 
- 
+```
+tmpfs /tmp tmpfs mode=1777,nosuid,nodev 0 0
+```
 
-|                                                 |
-| ----------------------------------------------- |
-| **tmpfs /tmp tmpfs mode=1777,nosuid,nodev 0 0** |
-
-**Installing JDK 11:**
+## Installing JDK 11
 
 **Humio requires a Java version 11 or later JVM to function properly.**
 
@@ -91,70 +86,87 @@ To permanently remove the noexec flag, update **/etc/fstab** to remove the flag 
 
 **Installing JDK11:**
 
-|                                                       |
-| ----------------------------------------------------- |
-| $ sudo yum -y install jdk-11.0.15.1_linux-x64_bin.rpm |
+```
+sudo yum -y install jdk-11.0.15.1_linux-x64_bin.rpm
+```
 
 **If everything is alright you’ll see the following output**
 
-|                                                                                                                                                            |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Java --versionJava(TM) SE Runtime Environment 18.9 (build 11.0.15.1+2-LTS-10)Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.15.1+2-LTS-10, mixed mode) |
+```
+Java --version
+Java(TM) SE Runtime Environment 18.9 (build 11.0.15.1+2-LTS-10)
+Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.15.1+2-LTS-10, mixed mode)
+```
 
-**Installing Kafka**
+## Installing Kafka
 
 **At first add Kafka system user like the following**
 
-|                                                                           |
-| ------------------------------------------------------------------------- |
-| $ sudo adduser kafka --shell=/bin/false --no-create-home --system --group |
+```
+$ sudo adduser kafka --shell=/bin/false --no-create-home --system --group
+```
 
 **Download kafka: **
 
-|                                                                                               |
-| --------------------------------------------------------------------------------------------- |
-| $ curl -o kafka_2.13-3.3.1.tgz https&#x3A;//dlcdn.apache.org/kafka/3.2.0/kafka_2.13-3.3.1.tgz |
+```
+$ curl -o kafka_2.13-3.3.1.tgz https://dlcdn.apache.org/kafka/3.2.0/kafka_2.13-3.3.1.tgz
+```
 
 **Create the following directories**
-
-|                                |
-| ------------------------------ |
-| $ mkdir /data /usr/local/humio |
+```
+$ mkdir /data /usr/local/humio
+```
 
 **Untar kafka to /usr/local/humio directory**
 
-|                                                        |
-| ------------------------------------------------------ |
-| $ sudo tar -zxf kafka_2.13-3.3.1.tgz /usr/local/humio/ |
+```
+$ sudo tar -zxf kafka_2.13-3.3.1.tgz /usr/local/humio/
+```
 
 **Create the following directory**
 
-|                                                                                                                                                                  |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| $ sudo mkdir -p /data/kafka/log/kafka /data/kafka/kafka-data$ sudo chown -R kafka:kafka /data/kafka$ sudo chown -R kafka:kafka /usr/local/humio/kafka_2.13-3.3.1 |
+```
+$ sudo mkdir -p /data/kafka/log/kafka /data/kafka/kafka-data
+$ sudo chown -R kafka:kafka /data/kafka
+$ sudo chown -R kafka:kafka /usr/local/humio/kafka_2.13-3.3.1
+```
 
 **Navigate to **/usr/local/humio/kafka/config** and then edit the following details of the **server.properties** file.**
 
-|                                                                                                                      |
-| -------------------------------------------------------------------------------------------------------------------- |
-| **broker.****id****=1********log.****dirs****=/data/kafka/kafka-data********delete.topic.****enable**** = ****true** |
+```
+broker.id=1
+log.dirs=/data/kafka/kafka-data
+delete.topic.enable = true
+```
 
 **Now create a file named “kafka.service” under /etc/systemd/system directory and paste the following details inside that file.**
 
-|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **\[Unit]********Requires=zookeeper.service********After=zookeeper.service************\[Service]********Type=simple********User=kafka********LimitNOFILE=****800000********Environment=****"LOG_DIR=/data/kafka/log/kafka"********Environment=****"GC_LOG_ENABLED=true"********Environment=****"KAFKA_HEAP_OPTS=-Xms512M -Xmx4G"********ExecStart=/usr/local/humio/kafka/bin/kafka-server-start.sh /usr/local/humio/kafka/config/server.properties********Restart=****on****-failure************\[Install]********WantedBy=multi-user.target** |
+```
+[Unit]
+Requires=zookeeper.service
+After=zookeeper.service
+
+[Service]
+Type=simple
+User=kafka
+LimitNOFILE=800000
+Environment="LOG_DIR=/data/kafka/log/kafka"
+Environment="GC_LOG_ENABLED=true"
+Environment="KAFKA_HEAP_OPTS=-Xms512M -Xmx4G"
+ExecStart=/usr/local/humio/kafka/bin/kafka-server-start.sh /usr/local/humio/kafka/config/server.properties
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
 
 **If we look at the \[Unit] section, we’ll see it requires zookeeper service. So we have to install zookeeper before we can start kafka service.**
 
 **Set up Zookeeper**
 
-|                                                                                                                                |
-| ------------------------------------------------------------------------------------------------------------------------------ |
-| $ curl -o zookeeper-3.7.1-bin.tar.gz https&#x3A;//dlcdn.apache.org/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-bin.tar.gz |
-
-  
-
+```
+$ curl -o zookeeper-3.7.1-bin.tar.gz https://dlcdn.apache.org/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-bin.tar.gz
+```
 
 **Creating zookeeper system user**
 
