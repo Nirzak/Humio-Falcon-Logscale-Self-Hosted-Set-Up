@@ -82,7 +82,7 @@ tmpfs /tmp tmpfs mode=1777,nosuid,nodev 0 0
 
 **Humio requires a Java version 11 or later JVM to function properly.**
 
-**Download the latest JDK 11 x64 compressed archive from here **[**https://www.oracle.com/java/technologies/javase-jdk11-downloads.html**](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)** **
+Download the latest JDK 11 x64 compressed archive from here: [https://www.oracle.com/java/technologies/javase-jdk11-downloads.html] (https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
 
 **Installing JDK11:**
 
@@ -170,33 +170,46 @@ $ curl -o zookeeper-3.7.1-bin.tar.gz https://dlcdn.apache.org/zookeeper/zookeepe
 
 **Creating zookeeper system user**
 
-|                                                                               |
-| ----------------------------------------------------------------------------- |
-| $ sudo adduser zookeeper --shell=/bin/false --no-create-home --system --group |
+```
+$ sudo adduser zookeeper --shell=/bin/false --no-create-home --system --group
+```
 
-**Untar Zookeeper to /opt directory**
+**Untar Zookeeper to /usr/local/humio directory**
 
-|                                                                                                                                                                                                                                        |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| $ sudo tar -zxf zookeeper-3.7.1-bin.tar.gz /usr/local/humio/$ sudo mkdir -p /data/zookeeper/data$ sudo ln -s /usr/local/humio/apache-zookeeper-3.7.1-bin /usr/local/humio/zookeeper$ sudo chown -R zookeeper:zookeeper /data/zookeeper |
+```
+$ sudo tar -zxf zookeeper-3.7.1-bin.tar.gz /usr/local/humio/
+$ sudo mkdir -p /data/zookeeper/data
+$ sudo ln -s /usr/local/humio/apache-zookeeper-3.7.1-bin /usr/local/humio/zookeeper
+$ sudo chown -R zookeeper:zookeeper /data/zookeeper
+```
 
-**Create a file named zoo.cfg inside /opt/zookeeper/conf directory**
+**Create a file named zoo.cfg inside /usr/local/humio/zookeeper/conf directory**
 
-|                                                   |
-| ------------------------------------------------- |
-| $ sudo vi /usr/local/humio/zookeeper/conf/zoo.cfg |
+```
+$ sudo vi /usr/local/humio/zookeeper/conf/zoo.cfg |
+```
 
 **Paste the following lines inside that file**
 
-|                                                                                                                                                                                                                                                                                                                              |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **tickTime = 2000********dataDir = /var/zookeeper/data********clientPort = 2181********initLimit = 5********syncLimit = 2********maxClientCnxns=60********autopurge.purgeInterval=1********admin.enableServer=false********4lw.commands.whitelist=\*********server.1=&lt;hostip>:2888:3888********admin.enableServer=false** |
+```
+tickTime = 2000
+dataDir = /var/zookeeper/data
+clientPort = 2181
+initLimit = 5
+syncLimit = 2
+maxClientCnxns=60
+autopurge.purgeInterval=1
+admin.enableServer=false
+4lw.commands.whitelist=*
+server.1=<hostip>:2888:3888
+admin.enableServer=false
+```
 
-**Create a ****myid**** file in the ****data**** sub-directory with just the number ****1**** as its contents. **
+Create a `myid` file in the `data` sub-directory with just the number `1` as its contents.
 
-|                                                     |
-| --------------------------------------------------- |
-| $ sudo bash -c 'echo 1 > /data/zookeeper/data/myid' |
+```
+$ sudo bash -c 'echo 1 > /data/zookeeper/data/myid'
+```
 
 **Then you can start Zookeeper to verify that the configuration is working**
 
