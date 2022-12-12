@@ -215,112 +215,143 @@ $ sudo bash -c 'echo 1 > /data/zookeeper/data/myid'
 
 **Give proper permissions to zookeeper directory**
 
-|                                                                                  |
-| -------------------------------------------------------------------------------- |
-| $ sudo chown -R zookeeper:zookeeper /usr/local/humio/apache-zookeeper-3.7.1-bin/ |
+```
+$ sudo chown -R zookeeper:zookeeper /usr/local/humio/apache-zookeeper-3.7.1-bin/
+```
 
 **Finally test if everything is ok or not by starting the server. ( You have to do it as root user)**
 
-|                           |
-| ------------------------- |
-| $ ./bin/zkServer.sh start |
+```
+$ ./bin/zkServer.sh start
+```
 
 **If the server starts successfully it will show the following message**
 
-|                                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| /usr/local/java/bin/javaZooKeeper JMX enabled by defaultUsing config: /opt/apache-zookeeper-3.7.1-bin/bin/../conf/zoo.cfgStarting zookeeper ... STARTED |
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
+```
+/usr/local/java/bin/java
+ZooKeeper JMX enabled by default
+Using config: /opt/apache-zookeeper-3.7.1-bin/bin/../conf/zoo.cfg
+Starting zookeeper ... STARTED
+```
 
 **Now we have to create a service to file to start zookeeper as a service. Create a zookeeper.service file inside /etc/systemd/system/ directory and paste the following lines**
 
-|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \[Unit]Description=Zookeeper DaemonDocumentation=http&#x3A;//zookeeper.apache.orgRequires=network.targetAfter=network.target\[Service]Type=forkingWorkingDirectory=/usr/local/humio/zookeeperUser=zookeeperGroup=zookeeperExecStart=/usr/local/humio/zookeeper/bin/zkServer.sh start /usr/local/humio/zookeeper/conf/zoo.cfgExecStop=/usr/local/humio/zookeeper/bin/zkServer.sh stop /usr/local/humio/zookeeper/conf/zoo.cfgExecReload=/usr/local/humio/zookeeper/bin/zkServer.sh restart /usr/local/humio/zookeeper/conf/zoo.cfgTimeoutSec=30Restart=on-failure\[Install]WantedBy=default.target |
+```
+[Unit]
+Description=Zookeeper Daemon
+Documentation=http://zookeeper.apache.org
+Requires=network.target
+After=network.target
+
+[Service]
+Type=forking
+WorkingDirectory=/usr/local/humio/zookeeper
+User=zookeeper
+Group=zookeeper
+ExecStart=/usr/local/humio/zookeeper/bin/zkServer.sh start /usr/local/humio/zookeeper/conf/zoo.cfg
+ExecStop=/usr/local/humio/zookeeper/bin/zkServer.sh stop /usr/local/humio/zookeeper/conf/zoo.cfg
+ExecReload=/usr/local/humio/zookeeper/bin/zkServer.sh restart /usr/local/humio/zookeeper/conf/zoo.cfg
+TimeoutSec=30
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
 
 **After all things are done correctly start zookeeper by executing the below command. But before that check, if there is any log created by the root user inside **/usr/local/humio/zookeeper/logs** directory. If there are any logs, remove them.**
 
 **Now start zookeeper.**
 
-|                                                                                               |
-| --------------------------------------------------------------------------------------------- |
-| $ sudo systemctl start zookeeper$ systemctl status zookeeper$ sudo systemctl enable zookeeper |
+```
+$ sudo systemctl start zookeeper
+$ systemctl status zookeeper
+$ sudo systemctl enable zookeeper
+```
 
 **After starting zookeeper we can now start Kafka.**
 
-|                                                                                   |
-| --------------------------------------------------------------------------------- |
-| $ sudo systemctl enable kafka$ sudo systemctl start kafka$ systemctl status kafka |
+```
+$ sudo systemctl enable kafka
+$ sudo systemctl start kafka
+$ systemctl status kafka
+```
 
-**Setting up Humio**
+## Setting up Humio
 
 **Create humio user**
 
-|                                                                           |
-| ------------------------------------------------------------------------- |
-| $ sudo adduser humio --shell=/bin/false --no-create-home --system --group |
+```
+$ sudo adduser humio --shell=/bin/false --no-create-home --system --group
+```
 
 **Creating humio directories**
 
-|                                                                                                                                 |
-| ------------------------------------------------------------------------------------------------------------------------------- |
-| $ sudo mkdir -p /data/humio/log/ /data/humio/data /usr/local/humio/humio_app$ sudo chown -R humio:humio /etc/humio/ /data/humio |
+```
+$ sudo mkdir -p /data/humio/log/ /data/humio/data /usr/local/humio/humio_app
+$ sudo chown -R humio:humio /etc/humio/ /data/humio
+```
 
 **We are now ready to download and install Humio’s software. Download latest humio from here:**
 
 [**https://repo.humio.com/service/rest/repository/browse/maven-releases/com/humio/server/**](https://repo.humio.com/service/rest/repository/browse/maven-releases/com/humio/server/)
 
-  
+```
+$ curl -o server-1.41.jar https://repo.humio.com/repository/maven-releases/com/humio/server/1.41.0/server-1.41.0.jar
 
+$ sudo mv server-1.41.jar /usr/local/humio/humio_app/
 
-|                                                                                                                                                                                                                                                                                                                         |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| $ curl -o server-1.41.jar https&#x3A;//repo.humio.com/repository/maven-releases/com/humio/server/1.41.0/server-1.41.0.jar$ sudo mv server-1.41.jar /usr/local/humio/humio_app/$ sudo ln -s /usr/local/humio/server-1.41.jar /usr/local/humio/humio_app/server.jar$ sudo chown -R humio:humio /usr/local/humio/humio_app |
+$ sudo ln -s /usr/local/humio/server-1.41.jar /usr/local/humio/humio_app/server.jar
+
+$ sudo chown -R humio:humio /usr/local/humio/humio_app
+```
 
 **Using a simple text editor, create the Humio configuration file, server.conf in the /etc/humio directory. You will need to enter a few environment variables in this configuration file to run Humio on a single server or instance. Below are those basic settings:**
 
-|                                  |
-| -------------------------------- |
-| $ sudo vi /etc/humio/server.conf |
+```
+$ sudo vi /etc/humio/server.conf
+```
 
-|                                                                                                                                                                                                                                                                                                                                                             |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| BOOTSTRAP_HOST_ID=1DIRECTORY=/var/humio/dataHUMIO_AUDITLOG_DIR=/data/humio/logHUMIO_DEBUGLOG_DIR=/data/humio/logHUMIO_PORT=8080ELASTIC_PORT=9200ZOOKEEPER_URL=&lt;hostip>:2181KAFKA_SERVERS=&lt;hostip>:9092EXTERNAL_URL=http&#x3A;//&lt;hostip or domain>:8080PUBLIC_URL=http&#x3A;//&lt;hostip or domain>HUMIO_SOCKET_BIND=0.0.0.0HUMIO_HTTP_BIND=0.0.0.0 |
+```
+BOOTSTRAP_HOST_ID=1
+DIRECTORY=/var/humio/data
+HUMIO_AUDITLOG_DIR=/data/humio/log
+HUMIO_DEBUGLOG_DIR=/data/humio/log
+HUMIO_PORT=8080
+ELASTIC_PORT=9200
+ZOOKEEPER_URL=<hostip>:2181
+KAFKA_SERVERS=<hostip>:9092
+EXTERNAL_URL=http://<hostip or domain>:8080
+PUBLIC_URL=http://<hostip or domain>
+HUMIO_SOCKET_BIND=0.0.0.0
+HUMIO_HTTP_BIND=0.0.0.0
+```
 
 **In the last create the humio.service file inside /etc/systemd/system/ directory and paste the below contents**
 
-|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \[Unit]Description=Humio serviceAfter=network.service\[Service]Type=notifyRestart=on-abnormalUser=humioGroup=humioLimitNOFILE=250000:250000EnvironmentFile=/etc/humio/server.confWorkingDirectory=/data/humioExecStart=/usr/bin/java -server -XX:+UseParallelOldGC -Xms12G -Xmx12G -XX:MaxDirectMemorySize=12G -Xss2M --add-exports java.base/jdk.internal.util=ALL-UNNAMED -XX:CompileCommand=dontinline,com/humio/util/HotspotUtilsJ.dontInline -Xlog:gc\*,gc+jni=debug:file=/data/humio/log/gc_humio.log:time,tags:filecount=5,filesize=102400 -Dhumio.auditlog.dir=/data/humio/log/ -Dhumio.debuglog.dir=/data/humio/log -jar /usr/local/humio/humio_app/server.jar\[Install]WantedBy=default.target |
+```
+[Unit]
+Description=Humio service
+After=network.service
 
-On above service file edit the parameter **“-Xms12G -Xmx12G -XX:MaxDirectMemorySize=12G”** according to your server specification. The recommended value of maximum heap and minimum heap size is calculated the by following formula.
+[Service]
+Type=notify
+Restart=on-abnormal
+User=humio
+Group=humio
+LimitNOFILE=250000:250000
+EnvironmentFile=/etc/humio/server.conf
+WorkingDirectory=/data/humio
+ExecStart=/usr/bin/java -server -XX:+UseParallelOldGC -Xms12G -Xmx12G -XX:MaxDirectMemorySize=12G -Xss2M --add-exports java.base/jdk.internal.util=ALL-UNNAMED -XX:CompileCommand=dontinline,com/humio/util/HotspotUtilsJ.dontInline -Xlog:gc*,gc+jni=debug:file=/data/humio/log/gc_humio.log:time,tags:filecount=5,filesize=102400 -Dhumio.auditlog.dir=/data/humio/log/ -Dhumio.debuglog.dir=/data/humio/log -jar /usr/local/humio/humio_app/server.jar
 
-**Maximum heap, minimum heap, MaxDirecMemory = (Number of CPU Cores \* 1) + 8GB**
+[Install]
+WantedBy=default.target
+```
 
-For example, If your CPU have **4 cores** then the value will be **4\*1 + 8 = 12GB**.
+On above service file edit the parameter `-Xms12G -Xmx12G -XX:MaxDirectMemorySize=12G` according to your server specification. The recommended value of maximum heap and minimum heap size is calculated the by following formula.
+
+`Maximum heap, minimum heap, MaxDirecMemory = (Number of CPU Cores \* 1) + 8GB`
+
+For example, If your CPU have `4 cores` then the value will be `4\*1 + 8 = 12GB`.
 
 Be sure to increase your server’s RAM according to it. 
 
@@ -328,14 +359,14 @@ Be sure to increase your server’s RAM according to it. 
 
 **Start the humio server by executing the following command:**
 
-|                              |
-| ---------------------------- |
-| $ sudo systemctl start humio |
+```
+$ sudo systemctl start humio
+```
 
 **Check for any errors in humio end:**
 
-|                        |
-| ---------------------- |
-| $ journalctl -fu humio |
+```
+$ journalctl -fu humio
+```
 
-**If there is no error, you can access the humio site by visiting http&#x3A;//&lt;serverip>:8080 on your browser.**
+If there is no error, you can access the humio site by visiting `http://<serverip>:8080` on your browser.
