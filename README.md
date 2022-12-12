@@ -106,7 +106,7 @@ Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.15.1+2-LTS-10, mixed mode)
 $ sudo adduser kafka --shell=/bin/false --no-create-home --system --group
 ```
 
-**Download kafka: **
+Download kafka:
 
 ```
 $ curl -o kafka_2.13-3.3.1.tgz https://dlcdn.apache.org/kafka/3.2.0/kafka_2.13-3.3.1.tgz
@@ -162,13 +162,15 @@ WantedBy=multi-user.target
 
 **If we look at the \[Unit] section, we’ll see it requires zookeeper service. So we have to install zookeeper before we can start kafka service.**
 
-**Set up Zookeeper**
+## Installing Zookeeper
+
+Download Zookeeper:
 
 ```
 $ curl -o zookeeper-3.7.1-bin.tar.gz https://dlcdn.apache.org/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-bin.tar.gz
 ```
 
-**Creating zookeeper system user**
+Creating zookeeper system user
 
 ```
 $ sudo adduser zookeeper --shell=/bin/false --no-create-home --system --group
