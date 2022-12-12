@@ -185,7 +185,7 @@ $ sudo ln -s /usr/local/humio/apache-zookeeper-3.7.1-bin /usr/local/humio/zookee
 $ sudo chown -R zookeeper:zookeeper /data/zookeeper
 ```
 
-**Create a file named zoo.cfg inside `/usr/local/humio/zookeeper/conf` directory**
+**Create a file named `zoo.cfg` inside `/usr/local/humio/zookeeper/conf` directory**
 
 ```
 $ sudo vi /usr/local/humio/zookeeper/conf/zoo.cfg
@@ -236,7 +236,7 @@ Using config: /opt/apache-zookeeper-3.7.1-bin/bin/../conf/zoo.cfg
 Starting zookeeper ... STARTED
 ```
 
-**Now we have to create a service to file to start zookeeper as a service. Create a zookeeper.service file inside /etc/systemd/system/ directory and paste the following lines**
+**Now we have to create a service to file to start zookeeper as a service. Create a `zookeeper.service` file inside `/etc/systemd/system/` directory and paste the following lines**
 
 ```
 [Unit]
