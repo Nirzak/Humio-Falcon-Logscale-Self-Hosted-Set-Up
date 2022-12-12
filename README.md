@@ -82,15 +82,15 @@ tmpfs /tmp tmpfs mode=1777,nosuid,nodev 0 0
 
 **Humio requires a Java version 11 or later JVM to function properly.**
 
-Download the latest JDK 11 x64 compressed archive from here: [https://www.oracle.com/java/technologies/javase-jdk11-downloads.html] (https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
+Download the latest JDK 11 x64 compressed archive from here: <https://www.oracle.com/java/technologies/javase-jdk11-downloads.html>
 
-**Installing JDK11:**
+**Installing JDK11 Using YUM:**
 
 ```
 sudo yum -y install jdk-11.0.15.1_linux-x64_bin.rpm
 ```
 
-**If everything is alright you’ll see the following output**
+If everything is alright you’ll see the following output:
 
 ```
 Java --version
@@ -131,7 +131,7 @@ $ sudo chown -R kafka:kafka /data/kafka
 $ sudo chown -R kafka:kafka /usr/local/humio/kafka_2.13-3.3.1
 ```
 
-**Navigate to **/usr/local/humio/kafka/config** and then edit the following details of the **server.properties** file.**
+Navigate to `/usr/local/humio/kafka/config` and then edit the following details of the `server.properties` file.
 
 ```
 broker.id=1
@@ -139,7 +139,7 @@ log.dirs=/data/kafka/kafka-data
 delete.topic.enable = true
 ```
 
-**Now create a file named “kafka.service” under /etc/systemd/system directory and paste the following details inside that file.**
+Now create a file named `kafka.service` under `/etc/systemd/system` directory and paste the following details inside that file.
 
 ```
 [Unit]
@@ -174,7 +174,7 @@ $ curl -o zookeeper-3.7.1-bin.tar.gz https://dlcdn.apache.org/zookeeper/zookeepe
 $ sudo adduser zookeeper --shell=/bin/false --no-create-home --system --group
 ```
 
-**Untar Zookeeper to /usr/local/humio directory**
+**Untar Zookeeper to `/usr/local/humio` directory**
 
 ```
 $ sudo tar -zxf zookeeper-3.7.1-bin.tar.gz /usr/local/humio/
@@ -183,17 +183,17 @@ $ sudo ln -s /usr/local/humio/apache-zookeeper-3.7.1-bin /usr/local/humio/zookee
 $ sudo chown -R zookeeper:zookeeper /data/zookeeper
 ```
 
-**Create a file named zoo.cfg inside /usr/local/humio/zookeeper/conf directory**
+**Create a file named zoo.cfg inside `/usr/local/humio/zookeeper/conf` directory**
 
 ```
-$ sudo vi /usr/local/humio/zookeeper/conf/zoo.cfg |
+$ sudo vi /usr/local/humio/zookeeper/conf/zoo.cfg
 ```
 
 **Paste the following lines inside that file**
 
 ```
 tickTime = 2000
-dataDir = /var/zookeeper/data
+dataDir = /data/zookeeper/data
 clientPort = 2181
 initLimit = 5
 syncLimit = 2
@@ -258,7 +258,7 @@ Restart=on-failure
 WantedBy=default.target
 ```
 
-**After all things are done correctly start zookeeper by executing the below command. But before that check, if there is any log created by the root user inside **/usr/local/humio/zookeeper/logs** directory. If there are any logs, remove them.**
+**After all things are done correctly start zookeeper by executing the below command. But before that check, if there is any log created by the root user inside `/usr/local/humio/zookeeper/logs` directory. If there are any logs, remove them.**
 
 **Now start zookeeper.**
 
@@ -305,7 +305,7 @@ $ sudo ln -s /usr/local/humio/server-1.41.jar /usr/local/humio/humio_app/server.
 $ sudo chown -R humio:humio /usr/local/humio/humio_app
 ```
 
-**Using a simple text editor, create the Humio configuration file, server.conf in the /etc/humio directory. You will need to enter a few environment variables in this configuration file to run Humio on a single server or instance. Below are those basic settings:**
+**Using a simple text editor, create the Humio configuration file, `server.conf` in the `/etc/humio` directory. You will need to enter a few environment variables in this configuration file to run Humio on a single server or instance. Below are those basic settings:**
 
 ```
 $ sudo vi /etc/humio/server.conf
@@ -313,7 +313,7 @@ $ sudo vi /etc/humio/server.conf
 
 ```
 BOOTSTRAP_HOST_ID=1
-DIRECTORY=/var/humio/data
+DIRECTORY=/data/humio/data
 HUMIO_AUDITLOG_DIR=/data/humio/log
 HUMIO_DEBUGLOG_DIR=/data/humio/log
 HUMIO_PORT=8080
@@ -326,7 +326,7 @@ HUMIO_SOCKET_BIND=0.0.0.0
 HUMIO_HTTP_BIND=0.0.0.0
 ```
 
-**In the last create the humio.service file inside /etc/systemd/system/ directory and paste the below contents**
+**In the last create the `humio.service` file inside `/etc/systemd/system/` directory and paste the below contents**
 
 ```
 [Unit]
