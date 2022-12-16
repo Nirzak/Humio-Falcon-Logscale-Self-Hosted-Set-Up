@@ -19,7 +19,12 @@ For more information read: <https://library.humio.com/humio-server/installation-
 
 **CPU:** 4 Cores
 
- 
+**Kafka Version:** 2.13-3.3.1
+
+**Zookeeper Version:** 3.7.1
+
+**Humio Falcon Version:** 1.67.0
+
 
 **Increase Open File Limit:**
 
@@ -300,11 +305,11 @@ $ sudo chown -R humio:humio /etc/humio/ /data/humio
 [**https://repo.humio.com/service/rest/repository/browse/maven-releases/com/humio/server/**](https://repo.humio.com/service/rest/repository/browse/maven-releases/com/humio/server/)
 
 ```
-$ curl -o server-1.41.jar https://repo.humio.com/repository/maven-releases/com/humio/server/1.41.0/server-1.41.0.jar
+$ curl -o server-1.67.jar https://repo.humio.com/repository/maven-releases/com/humio/server/1.67.0/server-1.67.0.jar
 
-$ sudo mv server-1.41.jar /usr/local/humio/humio_app/
+$ sudo mv server-1.67.jar /usr/local/humio/humio_app/
 
-$ sudo ln -s /usr/local/humio/server-1.41.jar /usr/local/humio/humio_app/server.jar
+$ sudo ln -s /usr/local/humio/server-1.67.jar /usr/local/humio/humio_app/server.jar
 
 $ sudo chown -R humio:humio /usr/local/humio/humio_app
 ```
