@@ -28,6 +28,7 @@ For more information read: <https://library.humio.com/humio-server/installation-
 
 
 
+
 **Increase Open File Limit:**
 
 For production usage, Humio needs to be able to keep a lot of files open for sockets and actual files from the file system.
