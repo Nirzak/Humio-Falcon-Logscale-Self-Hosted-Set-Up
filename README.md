@@ -26,6 +26,8 @@ For more information read: <https://library.humio.com/humio-server/installation-
 **Humio Falcon Version:** 1.67.0
 
 
+
+
 **Increase Open File Limit:**
 
 For production usage, Humio needs to be able to keep a lot of files open for sockets and actual files from the file system.
