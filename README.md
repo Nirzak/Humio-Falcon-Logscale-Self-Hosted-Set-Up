@@ -1,3 +1,5 @@
+# Humio Falcon Logscale Self Hosted Single Node Server Set Up Guide
+
 ## Requirements
 
 - You need to be able to hold 48 hours of compressed data in 80% of your RAM.
