@@ -1,4 +1,5 @@
 # Humio Falcon Logscale Self Hosted Single Node Server Set Up Guide
+## Doc Updated As of: 7th February, 2023
 
 ## Requirements
 
@@ -19,11 +20,11 @@ For more information read: <https://library.humio.com/humio-server/installation-
 
 **CPU:** 4 Cores
 
-**Kafka Version:** 2.13-3.3.1
+**Kafka Version:** 2.13-3.3.2
 
 **Zookeeper Version:** 3.7.1
 
-**Humio Falcon Version:** 1.67.0
+**Humio Falcon Version:** 1.70.1
 
 
 
@@ -119,7 +120,7 @@ $ sudo adduser kafka --shell=/bin/false --no-create-home --system --group
 Download kafka:
 
 ```
-$ curl -o kafka_2.13-3.3.1.tgz https://dlcdn.apache.org/kafka/3.2.0/kafka_2.13-3.3.1.tgz
+$ curl -o kafka_2.13-3.3.2.tgz https://dlcdn.apache.org/kafka/3.3.2/kafka_2.13-3.3.2.tgz
 ```
 
 **Create the following directories**
@@ -130,7 +131,7 @@ $ mkdir /data /usr/local/humio
 **Untar kafka to /usr/local/humio directory**
 
 ```
-$ sudo tar -zxf kafka_2.13-3.3.1.tgz /usr/local/humio/
+$ sudo tar -zxf kafka_2.13-3.3.2.tgz /usr/local/humio/
 ```
 
 **Create the following directory**
@@ -138,7 +139,7 @@ $ sudo tar -zxf kafka_2.13-3.3.1.tgz /usr/local/humio/
 ```
 $ sudo mkdir -p /data/kafka/log/kafka /data/kafka/kafka-data
 $ sudo chown -R kafka:kafka /data/kafka
-$ sudo chown -R kafka:kafka /usr/local/humio/kafka_2.13-3.3.1
+$ sudo chown -R kafka:kafka /usr/local/humio/kafka_2.13-3.3.2
 ```
 
 Navigate to `/usr/local/humio/kafka/config` and then edit the following details of the `server.properties` file.
@@ -308,11 +309,11 @@ $ sudo chown -R humio:humio /etc/humio/ /data/humio
 [**https://repo.humio.com/service/rest/repository/browse/maven-releases/com/humio/server/**](https://repo.humio.com/service/rest/repository/browse/maven-releases/com/humio/server/)
 
 ```
-$ curl -o server-1.67.jar https://repo.humio.com/repository/maven-releases/com/humio/server/1.67.0/server-1.67.0.jar
+$ curl -o server-1.70.1.jar https://repo.humio.com/repository/maven-releases/com/humio/server/1.70.1/server-1.70.1.jar
 
-$ sudo mv server-1.67.jar /usr/local/humio/humio_app/
+$ sudo mv server-1.70.1.jar /usr/local/humio/humio_app/
 
-$ sudo ln -s /usr/local/humio/server-1.67.jar /usr/local/humio/humio_app/server.jar
+$ sudo ln -s /usr/local/humio/server-1.70.1.jar /usr/local/humio/humio_app/server.jar
 
 $ sudo chown -R humio:humio /usr/local/humio/humio_app
 ```
@@ -329,8 +330,6 @@ DIRECTORY=/data/humio/data
 HUMIO_AUDITLOG_DIR=/data/humio/log
 HUMIO_DEBUGLOG_DIR=/data/humio/log
 HUMIO_PORT=8080
-ELASTIC_PORT=9200
-ZOOKEEPER_URL=<hostip>:2181
 KAFKA_SERVERS=<hostip>:9092
 EXTERNAL_URL=http://<hostip or domain>:8080
 PUBLIC_URL=http://<hostip or domain>
