@@ -1,5 +1,5 @@
 # Humio Falcon Logscale Self Hosted Single Node Server Set Up Guide
-## Doc Updated As of: 7th February, 2023
+## Doc Updated As of: 10th September, 2023
 
 ## Requirements
 
@@ -24,7 +24,7 @@ For more information read: <https://library.humio.com/humio-server/installation-
 
 **Zookeeper Version:** 3.7.1
 
-**Humio Falcon Version:** 1.70.1
+**Humio Falcon Version:** 1.100.0
 
 
 
@@ -89,24 +89,21 @@ To permanently remove the noexec flag, update **/etc/fstab** to remove the flag 
 tmpfs /tmp tmpfs mode=1777,nosuid,nodev 0 0
 ```
 
-## Installing JDK 11
+## Installing JDK 17
 
-**Humio requires a Java version 11 or later JVM to function properly.**
+**Humio requires a Java version 17 or later JVM to function properly.** (Doc updated as Humio will drop support for JDK version below 17 by the end of September 2023)
 
-Download the latest JDK 11 x64 compressed archive from here: <https://www.oracle.com/java/technologies/javase-jdk11-downloads.html>
+Download the latest JDK 17 x64 compressed archive from here: <https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html>
 
-**Installing JDK11 Using YUM:**
-
-```
-sudo yum -y install jdk-11.0.15.1_linux-x64_bin.rpm
-```
-
-If everything is alright you’ll see the following output:
+**Installing JDK17 By unextracting the compressed archive:**
+Extract the jdk tar archive to /usr/local/jdk directory
 
 ```
-Java --version
-Java(TM) SE Runtime Environment 18.9 (build 11.0.15.1+2-LTS-10)
-Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.15.1+2-LTS-10, mixed mode)
+tar -xf jdk-17.0.8_linux-x64_bin.tar.gz -C /usr/local/jdk
+cd /usr/local/jdk
+mv jdk-17.0.8/* .
+
+chmod -R o+rx /usr/local/jdk
 ```
 
 ## Installing Kafka
@@ -137,7 +134,7 @@ $ sudo tar -zxf kafka_2.13-3.3.2.tgz /usr/local/humio/
 **Create the following directory**
 
 ```
-$ sudo mkdir -p /data/kafka/log/kafka /data/kafka/kafka-data
+$ sudo mkdir -p /data/kafka/log /data/kafka/kafka-data
 $ sudo chown -R kafka:kafka /data/kafka
 $ sudo chown -R kafka:kafka /usr/local/humio/kafka_2.13-3.3.2
 ```
@@ -146,7 +143,7 @@ Navigate to `/usr/local/humio/kafka/config` and then edit the following details 
 
 ```
 broker.id=1
-log.dirs=/data/kafka/kafka-data
+log.dirs=/data/kafka/log
 delete.topic.enable = true
 ```
 
@@ -161,6 +158,7 @@ After=zookeeper.service
 Type=simple
 User=kafka
 LimitNOFILE=800000
+Environment="JAVA_HOME=/usr/local/jdk"
 Environment="LOG_DIR=/data/kafka/log/kafka"
 Environment="GC_LOG_ENABLED=true"
 Environment="KAFKA_HEAP_OPTS=-Xms512M -Xmx4G"
@@ -171,7 +169,7 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-**If we look at the \[Unit] section, we’ll see it requires zookeeper service. So we have to install zookeeper before we can start kafka service.**
+**If we look at the \[Unit\] section, we’ll see it requires zookeeper service. So we have to install zookeeper before we can start kafka service.**
 
 ## Installing Zookeeper
 
@@ -222,6 +220,16 @@ Create a `myid` file in the `data` sub-directory with just the number `1` as its
 
 ```
 $ sudo bash -c 'echo 1 > /data/zookeeper/data/myid'
+```
+
+Mentioning jdk path variable so that zookeeper uses that
+
+Create a file named `java.env` inside `/usr/local/humio/zookeeper/conf` directory and add the following line.
+
+```
+## Adding Custom JAVA_HOME
+
+JAVA_HOME="/usr/local/jdk"
 ```
 
 **Then you can start Zookeeper to verify that the configuration is working**
@@ -304,16 +312,18 @@ $ sudo mkdir -p /data/humio/log/ /data/humio/data /usr/local/humio/humio_app
 $ sudo chown -R humio:humio /etc/humio/ /data/humio
 ```
 
-**We are now ready to download and install Humio’s software. Download latest humio from here:**
+**We are now ready to download and install Humio’s software. Download latest humio stable version from here:**
 
-[**https://repo.humio.com/service/rest/repository/browse/maven-releases/com/humio/server/**](https://repo.humio.com/service/rest/repository/browse/maven-releases/com/humio/server/)
+[**https://repo.humio.com/repository/maven-releases/com/humio/server/1.100.0/server-1.100.0.tar.gz**](https://repo.humio.com/repository/maven-releases/com/humio/server/1.100.0/server-1.100.0.tar.gz)
 
 ```
-$ curl -o server-1.70.1.jar https://repo.humio.com/repository/maven-releases/com/humio/server/1.70.1/server-1.70.1.jar
+$ curl -o server-1.100.0.tar.gz https://repo.humio.com/repository/maven-releases/com/humio/server/1.100.0/server-1.100.0.tar.gz
 
-$ sudo mv server-1.70.1.jar /usr/local/humio/humio_app/
+$ tar -xzf server-1.100.0.tar.gz
 
-$ sudo ln -s /usr/local/humio/server-1.70.1.jar /usr/local/humio/humio_app/server.jar
+$ cd humio
+
+$ mv * /usr/local/humio/humio_app
 
 $ sudo chown -R humio:humio /usr/local/humio/humio_app
 ```
@@ -327,8 +337,10 @@ $ sudo vi /etc/humio/server.conf
 ```
 BOOTSTRAP_HOST_ID=1
 DIRECTORY=/data/humio/data
+JAVA_HOME=/usr/local/jdk
 HUMIO_AUDITLOG_DIR=/data/humio/log
 HUMIO_DEBUGLOG_DIR=/data/humio/log
+JVM_LOG_DIR=/data/humio/log
 HUMIO_PORT=8080
 KAFKA_SERVERS=<hostip>:9092
 EXTERNAL_URL=http://<hostip or domain>:8080
@@ -352,21 +364,11 @@ Group=humio
 LimitNOFILE=250000:250000
 EnvironmentFile=/etc/humio/server.conf
 WorkingDirectory=/data/humio
-ExecStart=/usr/bin/java -server -XX:+UseParallelOldGC -Xms12G -Xmx12G -XX:MaxDirectMemorySize=12G -Xss2M --add-exports java.base/jdk.internal.util=ALL-UNNAMED -XX:CompileCommand=dontinline,com/humio/util/HotspotUtilsJ.dontInline -Xlog:gc*,gc+jni=debug:file=/data/humio/log/gc_humio.log:time,tags:filecount=5,filesize=102400 -Dhumio.auditlog.dir=/data/humio/log/ -Dhumio.debuglog.dir=/data/humio/log -jar /usr/local/humio/humio_app/server.jar
+ExecStart=/usr/local/humio/humio_app/bin/humio-server-start.sh
 
 [Install]
 WantedBy=default.target
 ```
-
-On above service file edit the parameter `-Xms12G -Xmx12G -XX:MaxDirectMemorySize=12G` according to your server specification. The recommended value of maximum heap and minimum heap size is calculated the by following formula.
-
-`Maximum heap, minimum heap, MaxDirecMemory = (Number of CPU Cores \* 1) + 8GB`
-
-For example, If your CPU have `4 cores` then the value will be `4\*1 + 8 = 12GB`.
-
-Be sure to increase your server’s RAM according to it. 
-
-**Your server’s RAM must have to be >  (Maximum Heap Size + MaxDirectoryMemory)**. In this case 12GB. For more info read here: <https://library.humio.com/humio-server/configuration-jvm.html>
 
 **Start the humio server by executing the following command:**
 
