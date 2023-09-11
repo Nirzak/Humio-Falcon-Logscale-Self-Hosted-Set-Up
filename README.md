@@ -1,5 +1,5 @@
 # Humio Falcon Logscale Self Hosted Single Node Server Set Up Guide
-## Doc Updated As of: 10th September, 2023
+## Doc Updated As of: 11th September, 2023
 
 ## Requirements
 
@@ -212,7 +212,6 @@ maxClientCnxns=60
 autopurge.purgeInterval=1
 admin.enableServer=false
 4lw.commands.whitelist=*
-server.1=<hostip>:2888:3888
 admin.enableServer=false
 ```
 
