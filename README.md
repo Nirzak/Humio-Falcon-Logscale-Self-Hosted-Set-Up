@@ -10,7 +10,7 @@
 Humio recommends at least 16 CPU cores, 32 GB of memory, and a 1 GBit Network card for single server set up on production environment.
 Disk space will depend on the amount of ingested data per day and the number of retention days.
 This is calculated as follows: Retention Days x GB Injected / Compression Factor. That will determine the needed disk space for a single server.
-For more information read: <https://library.humio.com/humio-server/installation-provisioning-sizing.html>
+For more information read: <https://library.humio.com/falcon-logscale-self-hosted/installation-provisioning-sizing.html>
 
 **Set Up Used in this Doc:**
 
