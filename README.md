@@ -1,5 +1,5 @@
 # Humio Falcon Logscale Self Hosted Single Node Server Set Up Guide
-## Doc Updated As of: 11th September, 2023
+## Doc Updated As of: 6th June, 2024
 
 ## Requirements
 
@@ -10,7 +10,6 @@
 Humio recommends at least 16 CPU cores, 32 GB of memory, and a 1 GBit Network card for single server set up on production environment.
 Disk space will depend on the amount of ingested data per day and the number of retention days.
 This is calculated as follows: Retention Days x GB Injected / Compression Factor. That will determine the needed disk space for a single server.
-For more information read: <https://library.humio.com/falcon-logscale-self-hosted/installation-provisioning-sizing.html>
 
 **Set Up Used in this Doc:**
 
@@ -24,7 +23,7 @@ For more information read: <https://library.humio.com/falcon-logscale-self-hoste
 
 **Zookeeper Version:** 3.7.1
 
-**Humio Falcon Version:** 1.100.0
+**Humio Falcon Version:** 1.136.1
 
 
 
@@ -89,19 +88,19 @@ To permanently remove the noexec flag, update **/etc/fstab** to remove the flag 
 tmpfs /tmp tmpfs mode=1777,nosuid,nodev 0 0
 ```
 
-## Installing JDK 17
+## Installing JDK 21
 
-**Humio requires a Java version 17 or later JVM to function properly.** (Doc updated as Humio will drop support for JDK version below 17 by the end of September 2023)
+**Humio requires a Java version 17 or later JVM to function properly.** (Doc updated to use JDK 21 as Logscale will drop support for JDK version below 17 Soon)
 
-Download the latest JDK 17 x64 compressed archive from here: <https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html>
+Download the latest JDK 21 x64 compressed archive from here: <https://download.oracle.com/java/21/archive/jdk-21.0.2_linux-x64_bin.tar.gz>
 
-**Installing JDK17 By unextracting the compressed archive:**
+**Installing JDK21 By unextracting the compressed archive:**
 Extract the jdk tar archive to /usr/local/jdk directory
 
 ```
-tar -xf jdk-17.0.8_linux-x64_bin.tar.gz -C /usr/local/jdk
+tar -xf jdk-21.0.2_linux-x64_bin.tar.gz -C /usr/local/jdk
 cd /usr/local/jdk
-mv jdk-17.0.8/* .
+mv jdk-21.0.2/* .
 
 chmod -R o+rx /usr/local/jdk
 ```
